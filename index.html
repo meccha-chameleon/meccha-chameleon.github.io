@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meccha Chameleon — Paint. Hide. Deceive.</title>
+<meta name="description" content="The ultimate hide-and-seek party game where you paint your body to blend in. Over 1 million copies sold on Steam. Very Positive reviews.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #4ade80;
+    --green-dark: #22c55e;
+    --purple: #a855f7;
+    --pink: #ec4899;
+    --orange: #f97316;
+    --yellow: #eab308;
+    --cyan: #06b6d4;
+    --bg: #0a0a0f;
+    --bg2: #12121a;
+    --bg3: #1a1a28;
+    --text: #e4e4e7;
+    --text-dim: #a1a1aa;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── Nav ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    padding: 1rem 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: background 0.3s, backdrop-filter 0.3s;
+  }
+  nav.scrolled {
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .nav-logo { font-weight: 900; font-size: 1.25rem; background: linear-gradient(135deg, var(--green), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a { color: var(--text-dim); text-decoration: none; font-weight: 500; font-size: 0.9rem; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    padding: 0.5rem 1.25rem;
+    background: var(--green);
+    color: #111;
+    font-weight: 700;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .nav-cta:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(74,222,128,0.3); }
+
+  /* ── Hero ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    padding: 6rem 2rem 4rem;
+    position: relative;
+    background: radial-gradient(ellipse at 50% 0%, rgba(74,222,128,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, rgba(168,85,247,0.06) 0%, transparent 50%);
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 999px;
+    font-size: 0.8rem; font-weight: 600;
+    color: var(--text-dim);
+    margin-bottom: 1.5rem;
+    background: rgba(255,255,255,0.03);
+  }
+  .hero-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse-dot 2s infinite; }
+  @keyframes pulse-dot { 0%,100% {opacity:1} 50%{opacity:0.4} }
+
+  .hero h1 {
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, var(--green) 0%, var(--cyan) 50%, var(--purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1.5rem;
+  }
+  .hero p {
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    color: var(--text-dim);
+    max-width: 600px;
+    margin-bottom: 2.5rem;
+  }
+  .hero-buttons { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+  .btn-primary {
+    padding: 0.9rem 2.25rem;
+    background: var(--green);
+    color: #0a0a0f;
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: 999px;
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 40px rgba(74,222,128,0.3); }
+  .btn-secondary {
+    padding: 0.9rem 2.25rem;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--text);
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 999px;
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .btn-secondary:hover { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.04); }
+
+  .hero-stats {
+    display: flex; gap: 3rem; margin-top: 4rem;
+    flex-wrap: wrap; justify-content: center;
+  }
+  .hero-stat { text-align: center; }
+  .hero-stat .num { font-size: 2rem; font-weight: 900; background: linear-gradient(135deg, var(--green), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero-stat .lbl { font-size: 0.8rem; color: var(--text-dim); margin-top: 0.2rem; }
+
+  /* ── Sections ── */
+  section { padding: 6rem 2rem; }
+  .section-label {
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--green);
+    margin-bottom: 0.75rem;
+  }
+  .section-heading {
+    text-align: center;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+  }
+  .section-sub {
+    text-align: center;
+    color: var(--text-dim);
+    max-width: 560px;
+    margin: 0 auto 4rem;
+    font-size: 1.05rem;
+  }
+
+  /* ── Features Grid ── */
+  .features { background: var(--bg2); }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .feature-card {
+    background: var(--bg3);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 1rem;
+    padding: 2rem;
+    transition: transform 0.3s, border-color 0.3s;
+  }
+  .feature-card:hover { transform: translateY(-4px); border-color: rgba(74,222,128,0.2); }
+  .feature-icon { font-size: 2rem; margin-bottom: 1rem; display: block; }
+  .feature-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .feature-card p { color: var(--text-dim); font-size: 0.93rem; }
+
+  /* ── How to Play ── */
+  .how-to-play { background: radial-gradient(ellipse at 20% 50%, rgba(168,85,247,0.05) 0%, transparent 50%); }
+  .steps { max-width: 900px; margin: 0 auto; }
+  .step {
+    display: flex; gap: 1.5rem; align-items: flex-start;
+    padding: 2rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    width: 48px; height: 48px; min-width: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--green), var(--cyan));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 1.2rem; color: #0a0a0f;
+  }
+  .step h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.25rem; }
+  .step p { color: var(--text-dim); font-size: 0.95rem; }
+  .step-badges { display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap; }
+  .step-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem; font-weight: 600;
+    background: rgba(255,255,255,0.05);
+    color: var(--text-dim);
+  }
+
+  /* ── Game Modes ── */
+  .modes { background: var(--bg2); }
+  .modes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .mode-card {
+    background: var(--bg3);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 1rem;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    transition: transform 0.3s, border-color 0.3s;
+  }
+  .mode-card:hover { transform: translateY(-4px); border-color: rgba(168,85,247,0.2); }
+  .mode-card.featured { border-color: rgba(74,222,128,0.25); background: linear-gradient(180deg, rgba(74,222,128,0.04), transparent); }
+  .mode-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+  .mode-card h3 { font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem; }
+  .mode-card p { color: var(--text-dim); font-size: 0.93rem; margin-bottom: 1rem; }
+  .mode-tag {
+    display: inline-block;
+    padding: 0.3rem 1rem;
+    border-radius: 999px;
+    font-size: 0.75rem; font-weight: 700;
+    background: rgba(74,222,128,0.1);
+    color: var(--green);
+  }
+
+  /* ── Stats / Social Proof ── */
+  .social-proof { background: radial-gradient(ellipse at 50% 100%, rgba(74,222,128,0.04) 0%, transparent 60%); }
+  .proof-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .proof-item .num-lg {
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--green), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.1;
+  }
+  .proof-item .lbl { color: var(--text-dim); font-size: 0.9rem; margin-top: 0.25rem; }
+
+  .review-carousel {
+    max-width: 700px; margin: 4rem auto 0;
+    background: var(--bg3); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 1rem; padding: 2rem; text-align: center;
+  }
+  .review-text { font-size: 1.1rem; font-style: italic; color: var(--text-dim); margin-bottom: 1rem; }
+  .review-author { font-weight: 700; font-size: 0.9rem; }
+  .review-dots { display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem; }
+  .review-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    cursor: pointer; border: none;
+    transition: background 0.2s;
+  }
+  .review-dot.active { background: var(--green); }
+
+  /* ── CTA ── */
+  .cta-section {
+    background: linear-gradient(180deg, var(--bg2), var(--bg));
+    text-align: center;
+    padding: 8rem 2rem;
+  }
+  .cta-section .price {
+    font-size: 3rem; font-weight: 900;
+    background: linear-gradient(135deg, var(--green), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .cta-section .price-strikethrough {
+    font-size: 1.2rem;
+    color: var(--text-dim);
+    text-decoration: line-through;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  .cta-section .sale-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: var(--pink);
+    color: white;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    margin-left: 0.75rem;
+    vertical-align: middle;
+    animation: pulse-badge 2s infinite;
+  }
+  @keyframes pulse-badge { 0%,100%{opacity:1} 50%{opacity:0.75} }
+
+  /* ── Footer ── */
+  footer {
+    padding: 4rem 2rem; background: var(--bg2);
+    border-top: 1px solid rgba(255,255,255,0.04);
+    text-align: center;
+  }
+  footer p { color: var(--text-dim); font-size: 0.85rem; }
+  footer .links { display: flex; gap: 2rem; justify-content: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  footer .links a { color: var(--text-dim); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+  footer .links a:hover { color: var(--text); }
+  footer .jap { font-family: 'Inter', sans-serif; }
+
+  /* ── Scroll fade-in ── */
+  .fade-in { opacity: 0; transform: translateY(30px); transition: opacity 0.8s, transform 0.8s; }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .hero-stats { gap: 1.5rem; }
+    .step { flex-direction: column; gap: 0.75rem; }
+  }
+
+  @media (max-width: 400px) {
+    .hero-buttons { flex-direction: column; align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Navigation ── -->
+<nav id="navbar">
+  <span class="nav-logo">MECCHA CHAMELEON</span>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#how-to-play">How to Play</a></li>
+    <li><a href="#modes">Modes</a></li>
+    <li><a href="#stats">Stats</a></li>
+  </ul>
+  <a href="https://store.steampowered.com/app/4704690/MECCHA_CHAMELEON/" class="nav-cta" target="_blank" rel="noopener">Get on Steam</a>
+</nav>
+
+<!-- ── Hero ── -->
+<header class="hero">
+  <div class="hero-badge"><span class="dot"></span> Now Available on Steam</div>
+  <h1>Paint. Hide.<br>Deceive.</h1>
+  <p>The new-sensation hide-and-seek party game where you paint your body to blend into the environment. Over <strong>1 million copies</strong> sold in under a week.</p>
+  <div class="hero-buttons">
+    <a href="https://store.steampowered.com/app/4704690/MECCHA_CHAMELEON/" class="btn-primary" target="_blank" rel="noopener">
+      <span>🛒</span> Buy on Steam — $4.79
+    </a>
+    <a href="#how-to-play" class="btn-secondary">
+      <span>📖</span> How to Play
+    </a>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="num">1M+</div><div class="lbl">Copies Sold</div></div>
+    <div class="hero-stat"><div class="num">Very Positive</div><div class="lbl">80% Steam Reviews</div></div>
+    <div class="hero-stat"><div class="num">2–14</div><div class="lbl">Players per Lobby</div></div>
+    <div class="hero-stat"><div class="num">12</div><div class="lbl">Languages</div></div>
+  </div>
+</header>
+
+<!-- ── About / Features ── -->
+<section id="about" class="features">
+  <p class="section-label">What Is It?</p>
+  <h2 class="section-heading">A Hide-and-Seek Revolution</h2>
+  <p class="section-sub">Developed by Japanese indie creator <strong>lemorion_1224</strong>, Meccha Chameleon (めっちゃカメレオン — “Super Chameleon”) flips the hide-and-seek genre on its head. No props. No presets. You <em>paint</em> your disguise.</p>
+  <div class="features-grid">
+    <div class="feature-card fade-in">
+      <span class="feature-icon">🎨</span>
+      <h3>Body Painting System</h3>
+      <p>Use the in-game palette and eyedropper tool to sample colours from the environment and paint your character in real time. Every match creates unique camouflage.</p>
+    </div>
+    <div class="feature-card fade-in">
+      <span class="feature-icon">🕵️</span>
+      <h3>Asymmetric Multiplayer</h3>
+      <p>Split into Hiders and Seekers each round. Hiders blend in — Seekers must spot the subtle imperfections before time runs out.</p>
+    </div>
+    <div class="feature-card fade-in">
+      <span class="feature-icon">🗺️</span>
+      <h3>Diverse Stages</h3>
+      <p>Kitchens, party rooms, art galleries, checkered floors and more. Plus full Steam Workshop support for community-created custom maps.</p>
+    </div>
+    <div class="feature-card fade-in">
+      <span class="feature-icon">🎮</span>
+      <h3>Three Game Modes</h3>
+      <p>Normal hide-and-seek, Increasing Oni (infection-style), and Double mode where everyone hides then hunts. Something for every group.</p>
+    </div>
+    <div class="feature-card fade-in">
+      <span class="feature-icon">🌐</span>
+      <h3>Streamer Ready</h3>
+      <p>Public lobbies, viewer participation, and developer-blessed streaming. Just include the game name in your title and you're good to go.</p>
+    </div>
+    <div class="feature-card fade-in">
+      <span class="feature-icon">💬</span>
+      <h3>Proximity Voice Chat</h3>
+      <p>Talk to nearby players with built-in proximity voice (added in v1.1). Coordinate as a Seeker — or stay silent as a Hider.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── How to Play ── -->
+<section id="how-to-play" class="how-to-play">
+  <p class="section-label">Gameplay</p>
+  <h2 class="section-heading">How to Play</h2>
+  <p class="section-sub">Every round follows a simple loop. Master the three pillars — <strong>Painting</strong>, <strong>Position</strong>, and <strong>Pose</strong> — to survive.</p>
+  <div class="steps">
+    <div class="step fade-in">
+      <div class="step-num">1</div>
+      <div>
+        <h3>Join a Lobby</h3>
+        <p>Host picks the map, mode, and privacy settings. Anyone can join public lobbies — perfect for stream audiences.</p>
+        <div class="step-badges"><span class="step-badge">2–14 Players</span><span class="step-badge">Public or Private</span></div>
+      </div>
+    </div>
+    <div class="step fade-in">
+      <div class="step-num">2</div>
+      <div>
+        <h3>Preparation Phase</h3>
+        <p>Hiders start as pure white characters. You have limited time to explore the stage, pick a hiding spot, sample colours with the eyedropper, paint your body, and strike your pose.</p>
+        <div class="step-badges"><span class="step-badge">Paint Palette</span><span class="step-badge">Eyedropper Tool</span><span class="step-badge">Pose Menu</span></div>
+      </div>
+    </div>
+    <div class="step fade-in">
+      <div class="step-num">3</div>
+      <div>
+        <h3>The Hunt</h3>
+        <p>Seekers are released and must find every Hider before the timer expires. No flashlights — just sharp eyes. Tag suspicious players to eliminate them.</p>
+        <div class="step-badges"><span class="step-badge">Systematic Search</span><span class="step-badge">Anomaly Detection</span></div>
+      </div>
+    </div>
+    <div class="step fade-in">
+      <div class="step-num">4</div>
+      <div>
+        <h3>Victory or Defeat</h3>
+        <p>Seekers win by finding everyone. Hiders win if at least one survives. In Increasing Oni mode, caught Hiders join the Seeker team — the pressure ramps up every round.</p>
+        <div class="step-badges"><span class="step-badge">Win by Survival</span><span class="step-badge">Win by Elimination</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Game Modes ── -->
+<section id="modes" class="modes">
+  <p class="section-label">Game Modes</p>
+  <h2 class="section-heading">Three Ways to Play</h2>
+  <p class="section-sub">The host picks the mode before each match. All modes use the same paint-and-hide core — the twist is in what happens after the hunt begins.</p>
+  <div class="modes-grid">
+    <div class="mode-card featured fade-in">
+      <div class="mode-icon">🎯</div>
+      <h3>Normal</h3>
+      <p>Classic hide-and-seek with fixed teams. Hiders paint and hide — Seekers hunt. The purest experience and best starting point for new players.</p>
+      <span class="mode-tag">Recommended for Beginners</span>
+    </div>
+    <div class="mode-card fade-in">
+      <div class="mode-icon">🧟</div>
+      <h3>Increasing Oni</h3>
+      <p>Infection-style snowball mode. Caught Hiders become Seekers, so the hunting team grows every round. Chaos scales beautifully with 8+ players.</p>
+      <span class="mode-tag">Best with Large Groups</span>
+    </div>
+    <div class="mode-card fade-in">
+      <div class="mode-icon">⚡</div>
+      <h3>Double</h3>
+      <p>Everyone hides first, then everyone hunts. The fastest full clear wins. The most competitive mode — rewards players strong at both painting and spotting.</p>
+      <span class="mode-tag">Most Competitive</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── Stats & Social Proof ── -->
+<section id="stats" class="social-proof">
+  <p class="section-label">By the Numbers</p>
+  <h2 class="section-heading">A Global Phenomenon</h2>
+  <p class="section-sub">Launched June 10, 2026. The numbers speak for themselves.</p>
+  <div class="proof-grid fade-in">
+    <div class="proof-item"><div class="num-lg">1M+</div><div class="lbl">Copies sold in 4 days</div></div>
+    <div class="proof-item"><div class="num-lg">600K+</div><div class="lbl">Steam wishlists pre-launch</div></div>
+    <div class="proof-item"><div class="num-lg">51K</div><div class="lbl">Peak concurrent players</div></div>
+    <div class="proof-item"><div class="num-lg">128K</div><div class="lbl">Peak Twitch viewers</div></div>
+  </div>
+  <div class="review-carousel fade-in" id="reviewCarousel">
+    <p class="review-text" id="reviewText">“The painting mechanic is genuinely innovative — no two rounds ever play the same. This is the most fun I've had in a party game in years.”</p>
+    <p class="review-author" id="reviewAuthor">— Steam Reviewer</p>
+    <p style="color: #fbbf24; margin-top: 0.5rem;">★★★★★</p>
+    <div class="review-dots" id="reviewDots"></div>
+  </div>
+</section>
+
+<!-- ── Final CTA ── -->
+<section class="cta-section">
+  <p class="section-label">Get the Game</p>
+  <h2 class="section-heading">Ready to Blend In?</h2>
+  <p class="section-sub" style="margin-bottom:2rem;">Available exclusively on Steam for Windows, Mac, and Linux. Launch sale ends soon.</p>
+  <div style="margin-bottom:2rem;">
+    <span class="price-strikethrough">$5.99</span>
+    <span class="price">$4.79</span>
+    <span class="sale-badge">–20%</span>
+  </div>
+  <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 2rem;">Launch discount ends June 16, 2026</p>
+  <a href="https://store.steampowered.com/app/4704690/MECCHA_CHAMELEON/" class="btn-primary" target="_blank" rel="noopener" style="font-size:1.1rem; padding: 1rem 3rem;">
+    🛒 Buy on Steam
+  </a>
+</section>
+
+<!-- ── Footer ── -->
+<footer>
+  <div class="links">
+    <a href="https://store.steampowered.com/app/4704690/MECCHA_CHAMELEON/" target="_blank" rel="noopener">Steam Store</a>
+    <a href="https://steamcommunity.com/app/4704690" target="_blank" rel="noopener">Community Hub</a>
+    <a href="https://discord.gg/eNFUDBSwag" target="_blank" rel="noopener">Discord</a>
+    <a href="https://mecchachameleon.wiki/" target="_blank" rel="noopener">Wiki</a>
+  </div>
+  <p>Meccha Chameleon &copy; 2026 lemorion_1224. <span class="jap">めっちゃカメレオン</span></p>
+  <p style="margin-top:0.5rem;font-size:0.75rem;">This is a fan-made page. Not affiliated with lemorion_1224 or Steam.</p>
+</footer>
+
+<script>
+  // Nav scroll effect
+  const nav = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 50);
+  });
+
+  // Fade-in on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  // Review carousel
+  const reviews = [
+    {
+      text: "“The painting mechanic is genuinely innovative — no two rounds ever play the same. This is the most fun I've had in a party game in years.”",
+      author: "— Steam Reviewer"
+    },
+    {
+      text: "“Hilarious chaos. Watching friends try to blend into a checkered floor while you hunt them down is peak gaming comedy.”",
+      author: "— Steam Reviewer"
+    },
+    {
+      text: "“A creative masterpiece. The eyedropper tool and painting system work flawlessly, and Workshop support means infinite replayability.”",
+      author: "— Gaming.net (8/10)"
+    },
+    {
+      text: "“めっちゃ面白い！友達と遊ぶのに最高のゲーム。ペイント機能が斬新で、毎回違う展開になる。”",
+      author: "— Japanese Steam Reviewer"
+    }
+  ];
+
+  const textEl = document.getElementById('reviewText');
+  const authorEl = document.getElementById('reviewAuthor');
+  const dotsContainer = document.getElementById('reviewDots');
+  let currentReview = 0;
+
+  reviews.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'review-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', `Review ${i + 1}`);
+    dot.addEventListener('click', () => showReview(i));
+    dotsContainer.appendChild(dot);
+  });
+
+  function showReview(i) {
+    currentReview = i;
+    textEl.textContent = reviews[i].text;
+    authorEl.textContent = reviews[i].author;
+    document.querySelectorAll('.review-dot').forEach((d, j) => {
+      d.classList.toggle('active', j === i);
+    });
+  }
+
+  setInterval(() => {
+    showReview((currentReview + 1) % reviews.length);
+  }, 5000);
+</script>
+
+</body>
+</html>
